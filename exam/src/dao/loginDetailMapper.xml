@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.loginDetailMapper">
+  <resultMap id="BaseResultMap" type="pojo.loginDetail">
+    <id column="id" jdbcType="INTEGER" property="id" />
+   <!--  <result column="stu_id" jdbcType="INTEGER" property="stuId" />
+    <result column="course_id" jdbcType="INTEGER" property="courseId" /> -->
+    <result column="ip" jdbcType="VARCHAR" property="ip" />
+    <result column="cookieValue" jdbcType="VARCHAR" property="cookieValue" />
+    <result column="entryTime" jdbcType="TIMESTAMP" property="entryTime" />
+    <result column="exitTime" jdbcType="TIMESTAMP" property="exitTime" />
+    <result column="createTime" jdbcType="TIMESTAMP" property="createTime" />
+    <association property="student" resultMap="dao.userMapper.BaseResultMap"/>
+    <association property="course" resultMap="dao.courseMapper.BaseResultMap"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    logindetail.*,user.*,course.*
+  </sql>
+  
+    <select id="getBasicInfos"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from logindetail logindetail
+     left join user user on logindetail.stu_id=user.id
+     left join course course on logindetail.course_id=course.id
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+      <select id="getDetailInfos"  resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from logindetail logindetail
+     left join user user on logindetail.stu_id=user.id
+     left join course course on logindetail.course_id=course.id
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from logindetail logindetail
+     left join user user on logindetail.stu_id=user.id
+     left join course course on logindetail.course_id=course.id
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from logindetail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="pojo.loginDetail">
+    insert into logindetail (id, stu_id, course_id, 
+      ip, cookieValue, entryTime, 
+      exitTime, createTime)
+    values (#{id,jdbcType=INTEGER}, <choose>
+     <when test="student != null">#{student.id,jdbcType=INTEGER},</when>
+     <otherwise>NULL,</otherwise>
+    </choose><choose>
+     <when test="course != null">#{course.id,jdbcType=INTEGER},</when>
+     <otherwise>NULL,</otherwise>
+    </choose> 
+      #{ip,jdbcType=VARCHAR}, #{cookieValue,jdbcType=VARCHAR}, #{entryTime,jdbcType=TIMESTAMP}, 
+      #{exitTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="pojo.loginDetail">
+    insert into logindetail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="student != null">
+        stu_id,
+      </if>
+      <if test="course != null">
+        course_id,
+      </if>
+      <if test="ip != null">
+        ip,
+      </if>
+      <if test="cookieValue != null">
+        cookieValue,
+      </if>
+      <if test="entryTime != null">
+        entryTime,
+      </if>
+      <if test="exitTime != null">
+        exitTime,
+      </if>
+      <if test="createTime != null">
+        createTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="student != null">
+        #{student.id,jdbcType=INTEGER},
+      </if>
+      <if test="course != null">
+        #{course.id,jdbcType=INTEGER},
+      </if>
+      <if test="ip != null">
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="cookieValue != null">
+        #{cookieValue,jdbcType=VARCHAR},
+      </if>
+      <if test="entryTime != null">
+        #{entryTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="exitTime != null">
+        #{exitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="pojo.loginDetail">
+    update logindetail
+    <set>
+      <if test="student != null">
+        stu_id = #{student.id,jdbcType=INTEGER},
+      </if>
+      <if test="course != null">
+        course_id = #{course.id,jdbcType=INTEGER},
+      </if>
+      <if test="ip != null">
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="cookieValue != null">
+        cookieValue = #{cookieValue,jdbcType=VARCHAR},
+      </if>
+      <if test="entryTime != null">
+        entryTime = #{entryTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="exitTime != null">
+        exitTime = #{exitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        createTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="pojo.loginDetail">
+    update logindetail
+    set stu_id = <choose>
+     <when test="student != null">#{student.id,jdbcType=INTEGER},</when>
+     <otherwise>NULL,</otherwise>
+    </choose>
+      course_id = <choose>
+     <when test="course != null">#{course.id,jdbcType=INTEGER},</when>
+     <otherwise>NULL,</otherwise>
+    </choose>
+      ip = #{ip,jdbcType=VARCHAR},
+      cookieValue = #{cookieValue,jdbcType=VARCHAR},
+      entryTime = #{entryTime,jdbcType=TIMESTAMP},
+      exitTime = #{exitTime,jdbcType=TIMESTAMP},
+      createTime = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+    <delete id="deletes" parameterType="list">
+  delete from loginDetail where  id in <foreach collection="list" open="(" item="value" separator="," close=")">#{value}</foreach>
+  </delete>
+  
+</mapper>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.userMapper">
+  <resultMap id="BaseResultMap" type="pojo.user">
+    <id column="user.id" jdbcType="INTEGER" property="id" />
+    <result column="user.name" jdbcType="VARCHAR" property="name" />
+    <result column="user.pwd" jdbcType="VARCHAR" property="pwd" />
+    <result column="user.noId" jdbcType="VARCHAR" property="noId" />
+    <result column="user.createTime" jdbcType="TIMESTAMP" property="createTime" />
+  <result column="user.type" jdbcType="INTEGER" property="type" />
+  </resultMap>
+  
+  <resultMap type="pojo.user" id="basiceRM" extends="BaseResultMap">
+  <association property="classInfo" javaType="pojo.classInfo">
+  <id column="user.class_id" property="id"/>
+  <result column="classinfo.className" property="className"/>
+  </association>
+  </resultMap>
+  
+    <resultMap id="userAndClassInfoMap" type="pojo.user">
+    <id column="user.id" jdbcType="INTEGER" property="id" />
+    <result column="user.name" jdbcType="VARCHAR" property="name" />
+    <result column="user.pwd" jdbcType="VARCHAR" property="pwd" />
+    <result column="user.noId" jdbcType="VARCHAR" property="noId" />
+    <result column="user.createTime" jdbcType="TIMESTAMP" property="createTime" />
+    <association property="classInfo" javaType="pojo.classInfo" resultMap="dao.classInfoMapper.BaseResultMap"/>
+  </resultMap>
+  
+  
+  <sql id="Base_Column_List">
+  user.id, user.name, user.pwd, user.noId, user.class_id,user.type, user.createTime,classinfo.className
+  </sql>
+ <sql id="Base_table_join">
+ from user user left join classinfo classinfo on user.class_id=classinfo.id
+ </sql>
+ 
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="basiceRM">
+    <!-- select 
+    <include refid="Base_Column_List" />
+    from user user
+    where id = #{id,jdbcType=INTEGER} -->
+    select
+    <include refid="Base_Column_List"/>
+    <include refid="Base_table_join"/>
+    where user.id=#{id,jdbcType=INTEGER}
+  </select>
+  
+  
+    <select id="getBasicInfos"  resultMap="basiceRM">
+    select
+    <include refid="Base_Column_List"/>
+    <include refid="Base_table_join"/>
+  </select>
+  
+    <select id="getDetailInfos" resultMap="userAndClassInfoMap">
+    select 
+    <include refid="dao.classInfoMapper.class_students" />
+    <include refid="Base_table_join"></include>
+  </select>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="pojo.user">
+    insert into user (id, name, pwd, 
+      noId,type,class_id, createTime
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{pwd,jdbcType=VARCHAR}, 
+      #{noId,jdbcType=VARCHAR}, <choose>
+     <when test="type != null">#{type,jdbcType=INTEGER},</when>
+     <otherwise>NULL,</otherwise>
+    </choose><choose>
+     <when test="classInfo != null">#{classInfo.id,jdbcType=INTEGER},</when>
+     <otherwise>NULL,</otherwise>
+    </choose>#{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="pojo.user">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="pwd != null">
+        pwd,
+      </if>
+      <if test="noId != null">
+        noId,
+      </if>
+      <if test="classInfo != null">
+        class_id,
+      </if>
+      <if test="createTime != null">
+        createTime,
+      </if>
+      <if test="type !=null">
+      type
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="pwd != null">
+        #{pwd,jdbcType=VARCHAR},
+      </if>
+      <if test="noId != null">
+        #{noId,jdbcType=VARCHAR},
+      </if>
+      <if test="classInfo != null">
+        #{classInfo.id,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type!=null">
+      #{type,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="pojo.user">
+    update user
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="pwd != null">
+        pwd = #{pwd,jdbcType=VARCHAR},
+      </if>
+      <if test="noId != null">
+        noId = #{noId,jdbcType=VARCHAR},
+      </if>
+      <if test="classInfo != null">
+        class_id = #{classInfo.id,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        createTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null">
+      type = #{type,jdbcType=INTEGER}
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="pojo.user">
+    update user
+    set name = #{name,jdbcType=VARCHAR},
+      pwd = #{pwd,jdbcType=VARCHAR},
+      noId = #{noId,jdbcType=VARCHAR},
+      class_id = <choose>
+     <when test="classInfo != null">#{classInfo.id,jdbcType=INTEGER},</when>
+     <otherwise>NULL,</otherwise>
+    </choose>
+    type=<choose>
+     <when test="type != null">#{type,jdbcType=INTEGER},</when>
+     <otherwise>NULL,</otherwise>
+    </choose>
+      createTime = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  
+    <delete id="deletes" parameterType="list">
+  delete from user where  id in <foreach collection="list" open="(" item="value" separator="," close=")">#{value}</foreach>
+  </delete>
+</mapper>

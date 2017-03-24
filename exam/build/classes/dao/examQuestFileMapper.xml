@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.examQuestFileMapper">
+	<resultMap id="BaseResultMap" type="pojo.examQuestFile">
+		<id column="examquestfile.id" jdbcType="INTEGER" property="id" />
+		<result column="examquestfile.filePath" jdbcType="VARCHAR"
+			property="filePath" />
+		<!-- <result column="examquestfile.teacher_id" jdbcType="INTEGER" property="teacherId" 
+			/> <result column="examquestfile.course_id" jdbcType="INTEGER" property="courseId" 
+			/> -->
+		<result column="examquestfile.createTime" jdbcType="TIMESTAMP"
+			property="createTime" />
+	</resultMap>
+
+	<resultMap id="examQuestFileDetailMap" type="pojo.examQuestFile">
+		<id column="examquestfile.id" jdbcType="INTEGER" property="id" />
+		<result column="examquestfile.filePath" jdbcType="VARCHAR"
+			property="filePath" />
+		<result column="examquestfile.createTime" jdbcType="TIMESTAMP"
+			property="createTime" />
+		<association property="teacher" resultMap="dao.userMapper.BaseResultMap" />
+		<association property="course" resultMap="dao.courseInfoMapper.BaseResultMap" />
+	</resultMap>
+
+
+	<sql id="Base_Column_List">
+		examquestfile.id, examquestfile.filePath, examquestfile.teacher_id,
+		examquestfile.course_id, examquestfile.createTime
+	</sql>
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from examquestfile examquestfile
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+<select id="getBasicInfos" 	resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from examquestfile examquestfile
+	</select>
+
+
+	<select id="getDetailInfos" resultMap="examQuestFileDetailMap">
+		select
+		examquestfile.*,user.*,course.*
+		from examquestfile examquestfile
+		left join user user on examquestfile.teacher_id=user.id
+		left join course course on examquestfile.course_id=course.id
+	</select>
+
+
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from examquestfile
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="pojo.examQuestFile">
+		insert into examquestfile (id, filePath, teacher_id,
+		course_id, createTime)
+		values (#{id,jdbcType=INTEGER}, #{filePath,jdbcType=VARCHAR},
+		<choose>
+			<when test="teacher != null">#{teacher.id,jdbcType=INTEGER},</when>
+			<otherwise>NULL,</otherwise>
+		</choose>
+		<choose>
+			<when test="course != null">#{course.id,jdbcType=INTEGER},</when>
+			<otherwise>NULL,</otherwise>
+		</choose>
+		#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	<insert id="insertSelective" parameterType="pojo.examQuestFile">
+		insert into examquestfile
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="filePath != null">
+				filePath,
+			</if>
+			<if test="teacher != null">
+				teacher_id,
+			</if>
+			<if test="course != null">
+				course_id,
+			</if>
+			<if test="createTime != null">
+				createTime,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="filePath != null">
+				#{filePath,jdbcType=VARCHAR},
+			</if>
+			<if test="teacher != null">
+				#{teacher.id,jdbcType=INTEGER},
+			</if>
+			<if test="course != null">
+				#{course.id,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="pojo.examQuestFile">
+		update examquestfile
+		<set>
+			<if test="filePath != null">
+				filePath = #{filePath,jdbcType=VARCHAR},
+			</if>
+			<if test="teacher != null">
+				teacher_id = #{teacher.id,jdbcType=INTEGER},
+			</if>
+			<if test="course != null">
+				course_id = #{course.id,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				createTime = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="pojo.examQuestFile">
+		update examquestfile
+		set filePath = #{filePath,jdbcType=VARCHAR},
+		teacher_id =
+		<choose>
+			<when test="teacher != null">#{teacher.id,jdbcType=INTEGER},</when>
+			<otherwise>NULL,</otherwise>
+		</choose>
+		course_id =
+		<choose>
+			<when test="course != null">#{course.id,jdbcType=INTEGER},</when>
+			<otherwise>NULL,</otherwise>
+		</choose>
+		createTime = #{createTime,jdbcType=TIMESTAMP}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	
+	  <delete id="deletes" parameterType="list">
+  delete from examQuestFile where  id in <foreach collection="list" open="(" item="value" separator="," close=")">#{value}</foreach>
+  </delete>
+</mapper>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.examItemMapper">
+	<resultMap id="BaseResultMap" type="pojo.examItem">
+		<id column="examitem.id" jdbcType="INTEGER" property="id" />
+		<!-- <result column="teacher_id" jdbcType="INTEGER" property="teacherId" 
+			/> <result column="course_id" jdbcType="INTEGER" property="courseId" /> <result 
+			column="class_id" jdbcType="INTEGER" property="classId" /> -->
+		<result column="examitem.starTime" jdbcType="TIMESTAMP"
+			property="starTime" />
+		<result column="examitem.endInterval" jdbcType="BIGINT"
+			property="endInterval" />
+		<result column="examitem.endAlert" jdbcType="BIGINT" property="endAlert" />
+		<result column="examitem.createTime" jdbcType="TIMESTAMP"
+			property="createTime" />
+	</resultMap>
+
+	<resultMap id="examItemDetailMap" type="pojo.examItem">
+		<id column="examitem.id" jdbcType="INTEGER" property="id" />
+		<!-- <result column="teacher_id" jdbcType="INTEGER" property="teacherId" 
+			/> <result column="course_id" jdbcType="INTEGER" property="courseId" /> <result 
+			column="class_id" jdbcType="INTEGER" property="classId" /> -->
+		<result column="examitem.starTime" jdbcType="TIMESTAMP"
+			property="starTime" />
+		<result column="examitem.endInterval" jdbcType="BIGINT"
+			property="endInterval" />
+		<result column="examitem.endAlert" jdbcType="BIGINT" property="endAlert" />
+		<result column="examitem.createTime" jdbcType="TIMESTAMP"
+			property="createTime" />
+		<association property="teacher" resultMap="dao.userMapper.BaseResultMap" />
+		<association property="course" resultMap="dao.courseMapper.BaseResultMap" />
+		<association property="examClass" resultMap="dao.classInfoMapper.BaseResultMap" />
+	</resultMap>
+
+	<select id="getDetailInfos" resultMap="examItemDetailMap">
+		select
+		examitem.*,user.*,course.*,classinfo.*
+		from examitem examitem
+		left join user user on examitem.teacher_id=user.id
+		left join course
+		course on examitem.course_id=corse.id
+		left join classinfo classinfo on
+		examitem.class_id=classinfo.id
+		<!-- where id = #{id,jdbcType=INTEGER} -->
+	</select>
+
+
+
+	<sql id="Base_Column_List">
+		examitem.id, examitem.teacher_id, examitem.course_id,
+		examitem.class_id,examitem.starTime, examitem.endInterval,
+		examitem.endAlert, examitem.createTime,teacher.id,teacher.name,course.id,course.courseName,examClass.id,examClass.className
+		from examitem examitem
+	</sql>
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from examitem examitem
+		where examitem.id = #{id,jdbcType=INTEGER}
+	</select>
+	
+		<select id="getBasicInfos" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from examitem examitem
+	</select>
+	
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		examitem
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="pojo.examItem">
+		insert into examitem (id, teacher_id, course_id,
+		class_id, starTime,
+		endInterval,
+		endAlert, createTime)
+		values (#{id,jdbcType=INTEGER},
+		<choose>
+			<when test="teacher != null"> #{teacher.id,jdbcType=INTEGER}, </when>
+			<otherwise>NULL,</otherwise>
+		</choose>
+		<choose>
+			<when test="course != null"> #{course.id,jdbcType=INTEGER}, </when>
+			<otherwise>NULL,</otherwise>
+		</choose>
+		<choose>
+			<when test="examClass != null"> #{examClass.id,jdbcType=INTEGER}, </when>
+			<otherwise>NULL,</otherwise>
+		</choose>
+		#{starTime,jdbcType=TIMESTAMP},
+		#{endInterval,jdbcType=BIGINT},
+		#{endAlert,jdbcType=BIGINT},
+		#{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	<insert id="insertSelective" parameterType="pojo.examItem">
+		insert into examitem
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="teacher != null">
+				teacher_id,
+			</if>
+			<if test="course != null">
+				course_id,
+			</if>
+			<if test="examClass != null">
+				class_id,
+			</if>
+			<if test="starTime != null">
+				starTime,
+			</if>
+			<if test="endInterval != null">
+				endInterval,
+			</if>
+			<if test="endAlert != null">
+				endAlert,
+			</if>
+			<if test="createTime != null">
+				createTime,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="teacher != null">
+				#{teacher.id,jdbcType=INTEGER},
+			</if>
+			<if test="course != null">
+				#{course.id,jdbcType=INTEGER},
+			</if>
+			<if test="examClass != null">
+				#{examClass.id,jdbcType=INTEGER},
+			</if>
+			<if test="starTime != null">
+				#{starTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endInterval != null">
+				#{endInterval,jdbcType=BIGINT},
+			</if>
+			<if test="endAlert != null">
+				#{endAlert,jdbcType=BIGINT},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="pojo.examItem">
+		update examitem
+		<set>
+			<if test="teacher != null">
+				teacher_id = #{teacher.id,jdbcType=INTEGER},
+			</if>
+			<if test="course != null">
+				course_id = #{course.id,jdbcType=INTEGER},
+			</if>
+			<if test="examClass != null">
+				class_id = #{examClass.id,jdbcType=INTEGER},
+			</if>
+			<if test="starTime != null">
+				starTime = #{starTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endInterval != null">
+				endInterval = #{endInterval,jdbcType=BIGINT},
+			</if>
+			<if test="endAlert != null">
+				endAlert = #{endAlert,jdbcType=BIGINT},
+			</if>
+			<if test="createTime != null">
+				createTime = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="pojo.examItem">
+		update examitem
+		set teacher_id =
+		<choose>
+			<when test="teacher != null"> #{teacher.id,jdbcType=INTEGER}, </when>
+			<otherwise>NULL,</otherwise>
+		</choose>
+		course_id =
+		<choose>
+			<when test="course != null"> #{course.id,jdbcType=INTEGER}, </when>
+			<otherwise>NULL,</otherwise>
+		</choose>
+		class_id =
+		<choose>
+			<when test="examClass != null"> #{examClass.id,jdbcType=INTEGER}, </when>
+			<otherwise>NULL,</otherwise>
+		</choose>
+		starTime = #{starTime,jdbcType=TIMESTAMP},
+		endInterval =
+		#{endInterval,jdbcType=BIGINT},
+		endAlert = #{endAlert,jdbcType=BIGINT},
+		createTime = #{createTime,jdbcType=TIMESTAMP}
+		where id =
+		#{id,jdbcType=INTEGER}
+	</update>
+	
+	  <delete id="deletes" parameterType="list">
+  delete from examItem where  id in <foreach collection="list" open="(" item="value" separator="," close=")">#{value}</foreach>
+  </delete>
+	
+</mapper>
